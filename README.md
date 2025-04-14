@@ -9,6 +9,7 @@ During operation, it is important not to blindly use the default genome. First, 
 # sequence.fasta, reference genome and GCF_000001405
 
 These three files are larger, so please access them via the links below:
+https://drive.google.com/file/d/1-kvRtvxbfcFFYzZOrCPKtA3eqKVPHJVG/view?usp=drive_link
 
 # Dependencies：
 Python v3.8.7
