@@ -6,6 +6,9 @@ Download sequence.fasta, reference genome, GCF_000001405, and Smart-SNPerv3.exe.
 
 During operation, it is important not to blindly use the default genome. First, test with a smaller-scale background genome to ensure that the computer configuration can support the execution of Smart-SNPer. If the default genome is required, ensure that the computer has at least 32GB of RAM and a CPU with performance superior to the i5-12400F
 
+# sequence.fasta, reference genome and GCF_000001405
+
+These three files are larger, so please access them via the links below:
 
 # Dependencies：
 Python v3.8.7
