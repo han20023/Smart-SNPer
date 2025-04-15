@@ -4,6 +4,8 @@ an automated pipeline that efficiently designs crRNA and isothermal primers spec
 # Usage
 Download sequence.fasta, reference genome, GCF_000001405, and Smart-SNPerv3.exe. Follow the instructions provided within Smart-SNPerv3.exe for further steps.
 
+Branch A only needs to download the reference sequence. Branch B requires the download of Chrome browser and reference sequence. C branches require sequence.fasta, reference genome and GCF_000001405. Suggested B branch for personal use.
+
 During operation, it is important not to blindly use the default genome. First, test with a smaller-scale background genome to ensure that the computer configuration can support the execution of Smart-SNPer. If the default genome is required, ensure that the computer has at least 32GB of RAM and a CPU with performance superior to the i5-12400F
 
 # sequence.fasta, reference genome and GCF_000001405
