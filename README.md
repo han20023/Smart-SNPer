@@ -2,11 +2,13 @@
 An automated pipeline that efficiently designs crRNA and isothermal primers specifically optimized for single-tube, Cas12a-mediated SNP detection. This end-to-end solution rapidly converts raw SNP information into ready-to-use assay components within hours, thereby eliminating the need for manual multistep processing and ensuring optimal performance in the final one-pot RPA-Cas12a detection system.version 2.1, updated on May 9, 2025.
 
 # Usage
-Download sequence.fasta, reference genome, GCF_000001405, and Smart-SNPerv3.exe. Follow the instructions provided within Smart-SNPerv3.exe for further steps.
+Download sequence.fasta, reference genome, GCF_000001405, and Smart-SNPerv4.exe. Follow the instructions provided within Smart-SNPerv4.exe for further steps.
 
 Branch A only needs to download the reference sequence. Branch B requires the download of Chrome browser and reference sequence. C branches require sequence.fasta, reference genome and GCF_000001405. Suggested B branch for personal use.
 
 During operation, it is important not to blindly use the default genome. First, test with a smaller-scale background genome to ensure that the computer configuration can support the execution of Smart-SNPer. If the default genome is required, ensure that the computer has at least 32GB of RAM and a CPU with performance superior to the i5-12400F
+
+The rs121913237 folder contains the results of rs121913237 run at branch B using the default genome, which on a personal computer takes about 7h per crRNA.
 
 # sequence.fasta, reference genome and GCF_000001405
 
