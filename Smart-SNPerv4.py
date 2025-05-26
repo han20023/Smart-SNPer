@@ -255,22 +255,31 @@ if F == 'A':
 
     def predict_rna_structure_for_guide_sequences(guide_sequences):
         rna_structure_data = []
-        prefix_sequence = "TAATTTCTACTAAGTGTAGAT".replace("T", "U")
-
+        prefix_sequence = "TAATTTCTACTAAGTGTAGAT".replace("T", "U")  # 前缀序列
 
         if isinstance(guide_sequences, str):
             guide_sequences = [guide_sequences]
 
-
         for rna_sequence in guide_sequences:
+            # 将所有的 T 替换为 U (转为 RNA 序列)
             rna_sequence = rna_sequence.replace("T", "U")
             full_sequence = prefix_sequence + rna_sequence
+
+            # 预测该序列的二级结构和最小自由能
             structure, mfe = predict_rna_structure(full_sequence)
 
+            # 创建两个 crRNA 序列来进行配对
+            paired_sequence = full_sequence + full_sequence[::-1]  # 互补序列配对
+
+            # 使用 RNAfold 计算配对结构
+            pairing_structure, _ = RNA.fold(paired_sequence)
+
+            # 将所有数据存入字典
             rna_structure_data.append({
                 'Full RNA Sequence': full_sequence,
                 'Predicted Structure': structure,
-                'MFE (kcal/mol)': mfe
+                'MFE (kcal/mol)': mfe,
+                'Pairing Structure': pairing_structure  # 添加配对结构
             })
 
         return rna_structure_data
@@ -855,22 +864,31 @@ if F == 'B':
 
     def predict_rna_structure_for_guide_sequences(guide_sequences):
         rna_structure_data = []
-        prefix_sequence = "TAATTTCTACTAAGTGTAGAT".replace("T", "U")
+        prefix_sequence = "TAATTTCTACTAAGTGTAGAT".replace("T", "U")  # 前缀序列
 
-        # 如果 guide_sequences 是一个字符串而不是列表，将其转换为列表
         if isinstance(guide_sequences, str):
             guide_sequences = [guide_sequences]
 
-        # 处理 guide_sequences 中的每个 RNA 序列
         for rna_sequence in guide_sequences:
+            # 将所有的 T 替换为 U (转为 RNA 序列)
             rna_sequence = rna_sequence.replace("T", "U")
             full_sequence = prefix_sequence + rna_sequence
+
+            # 预测该序列的二级结构和最小自由能
             structure, mfe = predict_rna_structure(full_sequence)
 
+            # 创建两个 crRNA 序列来进行配对
+            paired_sequence = full_sequence + full_sequence[::-1]  # 互补序列配对
+
+            # 使用 RNAfold 计算配对结构
+            pairing_structure, _ = RNA.fold(paired_sequence)
+
+            # 将所有数据存入字典
             rna_structure_data.append({
                 'Full RNA Sequence': full_sequence,
                 'Predicted Structure': structure,
-                'MFE (kcal/mol)': mfe
+                'MFE (kcal/mol)': mfe,
+                'Pairing Structure': pairing_structure  # 添加配对结构
             })
 
         return rna_structure_data
@@ -924,19 +942,6 @@ if F == 'B':
                     positions.append(i)
             return positions
 
-        def process_sequence_chunk(seq_chunk, primer, total_count, max_occurrences, chunk_type="seq1"):
-            count = 0
-            seed_matches = find_seed_matches(primer, seq_chunk)
-            for match_pos in seed_matches:
-                if match_pos + len(primer) <= len(seq_chunk):
-                    full_match = seq_chunk[match_pos:match_pos + len(primer)]
-                    if get_hamming(primer, full_match) <= (len(primer) - threshold):
-                        count += 1
-                        total_count += 1
-                        if total_count > max_occurrences:
-                            break
-            return total_count
-
         for primer, start_pos in primers:
             gc_content = calculate_gc_content(primer)
             if gc_content < gc_min or gc_content > gc_max:
@@ -954,30 +959,55 @@ if F == 'B':
 
             total_count = 0
 
-            # 使用 ThreadPoolExecutor 处理每个序列
-            with ThreadPoolExecutor(max_workers=len(seq1)) as executor:
-                futures = []
+            # 对 seq1 和 rev_comp_seq1 中每个字符串进行处理
+            for seq_chunk, rev_comp_chunk in zip(seq1, rev_comp_seq1):
+                # 逐块处理 seq1
+                for start in range(0, len(seq_chunk), chunk_size):
+                    end = min(start + chunk_size + overlap, len(seq_chunk))
+                    chunk = seq_chunk[start:end]
 
-                # 对 seq1 中每个块并行处理
-                for seq_chunk in seq1:
-                    futures.append(
-                        executor.submit(process_sequence_chunk, seq_chunk, primer, total_count, max_occurrences,
-                                        "seq1"))
+                    count = 0
+                    seed_matches = find_seed_matches(primer, chunk)
+                    for match_pos in seed_matches:
+                        if match_pos + len(primer) <= len(chunk):
+                            full_match = chunk[match_pos:match_pos + len(primer)]
+                            if get_hamming(primer, full_match) <= (len(primer) - threshold):
+                                count += 1
+                                total_count += 1
+                                if total_count > max_occurrences:
+                                    break
 
-                # 对 rev_comp_seq1 中每个块并行处理
-                for rev_comp_chunk in rev_comp_seq1:
-                    futures.append(
-                        executor.submit(process_sequence_chunk, rev_comp_chunk, primer, total_count, max_occurrences,
-                                        "rev_comp_seq1"))
-
-                # 汇总所有线程的结果
-                for future in futures:
-                    total_count = future.result()
                     if total_count > max_occurrences:
                         break
 
+                if total_count > max_occurrences:
+                    break
+
+                # 处理反向互补序列
+                for start in range(0, len(rev_comp_chunk), chunk_size):
+                    end = min(start + chunk_size + overlap, len(rev_comp_chunk))
+                    rev_comp_chunk_sub = rev_comp_chunk[start:end]
+
+                    count = 0
+                    seed_matches_rev = find_seed_matches(primer, rev_comp_chunk_sub)
+                    for match_pos in seed_matches_rev:
+                        if match_pos + len(primer) <= len(rev_comp_chunk_sub):
+                            full_match = rev_comp_chunk_sub[match_pos:match_pos + len(primer)]
+                            if get_hamming(primer, full_match) <= (len(primer) - threshold):
+                                count += 1
+                                total_count += 1
+                                if total_count > max_occurrences:
+                                    break
+
+                    if total_count > max_occurrences:
+                        break
+
+                if total_count > max_occurrences:
+                    break
+
             if total_count <= max_occurrences:
                 filtered_primers.append((primer, start_pos))
+
         end_time = time.time()  # 记录结束时间
         print(f"Primer specificity analysis took {end_time - start_time:.2f} seconds.")
 
@@ -1533,22 +1563,31 @@ if F == 'C':
 
     def predict_rna_structure_for_guide_sequences(guide_sequences):
         rna_structure_data = []
-        prefix_sequence = "TAATTTCTACTAAGTGTAGAT".replace("T", "U")
-
+        prefix_sequence = "TAATTTCTACTAAGTGTAGAT".replace("T", "U")  # 前缀序列
 
         if isinstance(guide_sequences, str):
             guide_sequences = [guide_sequences]
 
-
         for rna_sequence in guide_sequences:
+            # 将所有的 T 替换为 U (转为 RNA 序列)
             rna_sequence = rna_sequence.replace("T", "U")
             full_sequence = prefix_sequence + rna_sequence
+
+            # 预测该序列的二级结构和最小自由能
             structure, mfe = predict_rna_structure(full_sequence)
 
+            # 创建两个 crRNA 序列来进行配对
+            paired_sequence = full_sequence + full_sequence[::-1]  # 互补序列配对
+
+            # 使用 RNAfold 计算配对结构
+            pairing_structure, _ = RNA.fold(paired_sequence)
+
+            # 将所有数据存入字典
             rna_structure_data.append({
                 'Full RNA Sequence': full_sequence,
                 'Predicted Structure': structure,
-                'MFE (kcal/mol)': mfe
+                'MFE (kcal/mol)': mfe,
+                'Pairing Structure': pairing_structure  # 添加配对结构
             })
 
         return rna_structure_data
