@@ -255,7 +255,7 @@ if F == 'A':
 
     def predict_rna_structure_for_guide_sequences(guide_sequences):
         rna_structure_data = []
-        prefix_sequence = "TAATTTCTACTAAGTGTAGAT".replace("T", "U")  # 前缀序列
+        prefix_sequence = "TAATTTCTACTAAGTGTAGAT".replace("T", "U")  # 前缀序列，转为 RNA 序列（用 U 替换 T）
 
         if isinstance(guide_sequences, str):
             guide_sequences = [guide_sequences]
@@ -268,18 +268,16 @@ if F == 'A':
             # 预测该序列的二级结构和最小自由能
             structure, mfe = predict_rna_structure(full_sequence)
 
-            # 创建两个 crRNA 序列来进行配对
-            paired_sequence = full_sequence + full_sequence[::-1]  # 互补序列配对
-
-            # 使用 RNAfold 计算配对结构
-            pairing_structure, _ = RNA.fold(paired_sequence)
+            # 需要将两条 RNA 序列拼接成一个字符串形式，使用 '&' 分隔
+            pairing_structure, mfe_pairing = RNA.cofold(full_sequence + '&' + full_sequence)
 
             # 将所有数据存入字典
             rna_structure_data.append({
                 'Full RNA Sequence': full_sequence,
                 'Predicted Structure': structure,
                 'MFE (kcal/mol)': mfe,
-                'Pairing Structure': pairing_structure  # 添加配对结构
+                'Pairing Structure': pairing_structure,  # 配对结构
+                'Pairing MFE (kcal/mol)': mfe_pairing  # 配对的最小自由能
             })
 
         return rna_structure_data
@@ -864,7 +862,7 @@ if F == 'B':
 
     def predict_rna_structure_for_guide_sequences(guide_sequences):
         rna_structure_data = []
-        prefix_sequence = "TAATTTCTACTAAGTGTAGAT".replace("T", "U")  # 前缀序列
+        prefix_sequence = "TAATTTCTACTAAGTGTAGAT".replace("T", "U")  # 前缀序列，转为 RNA 序列（用 U 替换 T）
 
         if isinstance(guide_sequences, str):
             guide_sequences = [guide_sequences]
@@ -877,22 +875,19 @@ if F == 'B':
             # 预测该序列的二级结构和最小自由能
             structure, mfe = predict_rna_structure(full_sequence)
 
-            # 创建两个 crRNA 序列来进行配对
-            paired_sequence = full_sequence + full_sequence[::-1]  # 互补序列配对
-
-            # 使用 RNAfold 计算配对结构
-            pairing_structure, _ = RNA.fold(paired_sequence)
+            # 需要将两条 RNA 序列拼接成一个字符串形式，使用 '&' 分隔
+            pairing_structure, mfe_pairing = RNA.cofold(full_sequence + '&' + full_sequence)
 
             # 将所有数据存入字典
             rna_structure_data.append({
                 'Full RNA Sequence': full_sequence,
                 'Predicted Structure': structure,
                 'MFE (kcal/mol)': mfe,
-                'Pairing Structure': pairing_structure  # 添加配对结构
+                'Pairing Structure': pairing_structure,  # 配对结构
+                'Pairing MFE (kcal/mol)': mfe_pairing  # 配对的最小自由能
             })
 
         return rna_structure_data
-
 
     def get_hamming(seq1, seq2):
         if len(seq1) != len(seq2):
@@ -1563,7 +1558,7 @@ if F == 'C':
 
     def predict_rna_structure_for_guide_sequences(guide_sequences):
         rna_structure_data = []
-        prefix_sequence = "TAATTTCTACTAAGTGTAGAT".replace("T", "U")  # 前缀序列
+        prefix_sequence = "TAATTTCTACTAAGTGTAGAT".replace("T", "U")  # 前缀序列，转为 RNA 序列（用 U 替换 T）
 
         if isinstance(guide_sequences, str):
             guide_sequences = [guide_sequences]
@@ -1576,18 +1571,16 @@ if F == 'C':
             # 预测该序列的二级结构和最小自由能
             structure, mfe = predict_rna_structure(full_sequence)
 
-            # 创建两个 crRNA 序列来进行配对
-            paired_sequence = full_sequence + full_sequence[::-1]  # 互补序列配对
-
-            # 使用 RNAfold 计算配对结构
-            pairing_structure, _ = RNA.fold(paired_sequence)
+            # 需要将两条 RNA 序列拼接成一个字符串形式，使用 '&' 分隔
+            pairing_structure, mfe_pairing = RNA.cofold(full_sequence + '&' + full_sequence)
 
             # 将所有数据存入字典
             rna_structure_data.append({
                 'Full RNA Sequence': full_sequence,
                 'Predicted Structure': structure,
                 'MFE (kcal/mol)': mfe,
-                'Pairing Structure': pairing_structure  # 添加配对结构
+                'Pairing Structure': pairing_structure,  # 配对结构
+                'Pairing MFE (kcal/mol)': mfe_pairing  # 配对的最小自由能
             })
 
         return rna_structure_data
