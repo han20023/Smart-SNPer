@@ -1,5 +1,6 @@
 # Smart-SNPer
 An automated pipeline that efficiently designs crRNA and isothermal primers specifically optimized for single-tube, Cas12a-mediated SNP detection. This end-to-end solution rapidly converts raw SNP information into ready-to-use assay components within hours, thereby eliminating the need for manual multistep processing and ensuring optimal performance in the final one-pot RPA-Cas12a detection system.version 2.1, updated on May 9, 2025.
+The web version of Smart-SNPer can be accessed at https://smart-crisprer.com/.
 
 # Usage
 Download sequence.fasta, reference genome, GCF_000001405, and Smart-SNPerv4.exe. Follow the instructions provided within Smart-SNPerv4.exe for further steps.
